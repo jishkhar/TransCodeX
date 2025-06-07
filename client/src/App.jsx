@@ -73,7 +73,7 @@ export default function Index() {
     setLoading(true)
 
     try {
-      const response = await fetch("https://transcodex.onrender.com", {
+      const response = await fetch("http://localhost:5000/upload", {
         method: "POST",
         body: formData,
       })

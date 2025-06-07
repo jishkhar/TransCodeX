@@ -6,7 +6,12 @@ const { exec } = require('child_process');
 const path = require('path');
 
 const app = express();
-const port = 5000;
+const port = process.env.PORT || 5000;
+
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
+}
 
 app.use(cors());
 const upload = multer({ dest: 'uploads/' });
@@ -17,6 +22,11 @@ const allowedFormats = [
   'mkv', 'flv', 'ogv', 'webm', 'h264', '264', 'hevc',
   'mp3', 'wav', 'ogg', 'aac', 'wma', 'flac'
 ];
+
+// Root route for test
+app.get("/", (req, res) => {
+  res.send("✅ TransCodeX backend is running");
+});
 
 app.post('/upload', upload.single('file'), (req, res) => {
   const inputPath = req.file.path;
@@ -30,7 +40,7 @@ app.post('/upload', upload.single('file'), (req, res) => {
 
   exec(`ffmpeg -i ${inputPath} ${outputPath}`, (err) => {
     if (err) {
-      console.error(err);
+      console.error('❌ FFmpeg Error:', err.message);
       return res.status(500).send('Conversion failed.');
     }
 
@@ -42,5 +52,5 @@ app.post('/upload', upload.single('file'), (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`✅ Server running at http://localhost:${port}`);
+  console.log(`✅ Server running on port ${port}`);
 });
